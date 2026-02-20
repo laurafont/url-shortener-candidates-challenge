@@ -1,15 +1,17 @@
 import { redirect } from "react-router";
 import type { Route } from "./+types/s.$code";
-import { shortenedUrls } from "@url-shortener/engine";
+import { getShortLinkRepository } from "~/dependencies";
 
-export function loader({ params }: Route.LoaderArgs) {
+export async function loader({ params }: Route.LoaderArgs) {
   const { code } = params;
 
-  const url = shortenedUrls.get(code);
+  const repository = getShortLinkRepository();
+  const shortLink = await repository.getByCode(code);
 
-  if (!url) {
+  if (!shortLink) {
     throw new Response("Not Found", { status: 404 });
   }
 
-  return redirect(url);
+  await repository.recordClick(code);
+  return redirect(shortLink.originalUrl);
 }

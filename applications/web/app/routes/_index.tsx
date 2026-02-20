@@ -1,32 +1,30 @@
 import { Form, useActionData } from "react-router";
 import type { Route } from "./+types/_index";
-import {
-  baseUrl,
-  shortenedUrls,
-  generateShortCode,
-} from "@url-shortener/engine";
+import { baseUrl } from "@url-shortener/engine";
+import { getShortLinkRepository } from "~/dependencies";
+import { createShortLink } from "~/services/create-short-link";
 
-export function loader() {
+export async function loader() {
+  const repository = getShortLinkRepository();
+  const links = await repository.listWithStats();
   return {
     baseUrl: baseUrl ? baseUrl + "/s/" : "-",
+    links,
   };
 }
 
 export async function action({ request }: Route.ActionArgs) {
   const formData = await request.formData();
-  const url = formData.get("url") as string;
+  const url = (formData.get("url") as string) ?? "";
 
-  if (!url) {
-    return { error: "URL is required" };
+  const repository = getShortLinkRepository();
+  const shortLinkBase = baseUrl ? baseUrl + "/s/" : "-";
+  const result = await createShortLink(repository, url, shortLinkBase);
+
+  if (result.ok) {
+    return { shortenedUrl: result.shortenedUrl };
   }
-
-  const shortCode = generateShortCode();
-
-  shortenedUrls.set(shortCode, url);
-
-  return {
-    shortenedUrl: `${baseUrl}/s/${shortCode}`,
-  };
+  return { error: result.error };
 }
 
 export function meta({}: Route.MetaArgs) {
