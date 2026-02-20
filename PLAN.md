@@ -6,13 +6,13 @@ Based on [CHALLENGE_DESCRIPTION.md](./CHALLENGE_DESCRIPTION.md). Prioritized for
 
 ## Priority order
 
-1. Fix code generator  
-2. Add database (Postgres + Prisma)  
-3. Add repository layer  
-4. Refactor loaders/actions (incl. click tracking + list with stats)  
-5. Security / abuse prevention  
-6. Frontend improvements (shadcn, validation, loading, errors, toast, empty state)  
-7. Testing  
+1. Fix code generator
+2. Add database (Postgres + Prisma)
+3. Add repository layer
+4. Refactor loaders/actions (incl. click tracking + list with stats)
+5. Security / abuse prevention
+6. Frontend improvements (shadcn, validation, loading, errors, toast, empty state)
+7. Testing
 8. Docker + README + submission
 
 ---
@@ -59,7 +59,7 @@ Based on [CHALLENGE_DESCRIPTION.md](./CHALLENGE_DESCRIPTION.md). Prioritized for
   - `getByCode(code: string): Promise<ShortLink | null>`
   - `listWithStats(): Promise<Array<ShortLinkWithStats>>`
   - `recordClick(code: string): Promise<void>` (or by id)
-  Use domain types (e.g. `ShortLink`, `ShortLinkWithStats`) that the engine exports; keep DTOs minimal.
+    Use domain types (e.g. `ShortLink`, `ShortLinkWithStats`) that the engine exports; keep DTOs minimal.
 - [ ] **3.2** Implement **Prisma repository** in the web app, e.g. `applications/web/app/infrastructure/prisma/short-link-repository.ts`, implementing the engine’s repository interface. Map between Prisma models and domain types.
 - [ ] **3.3** **Wiring:** Create Prisma client and repository instance at app startup (or in a small `app/dependencies.ts` / server entry). Pass the repository into whatever will be called from loaders/actions (see step 4). Do not import Prisma inside `libs/engine`.
 

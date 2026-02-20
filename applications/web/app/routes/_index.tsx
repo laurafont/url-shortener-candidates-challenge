@@ -2,6 +2,7 @@ import { Form, useActionData } from "react-router";
 import type { Route } from "./+types/_index";
 import { baseUrl } from "@url-shortener/engine";
 import { getShortLinkRepository } from "~/dependencies";
+import { checkRateLimit } from "~/lib/rate-limit";
 import { createShortLink } from "~/services/create-short-link";
 
 export async function loader() {
@@ -14,6 +15,10 @@ export async function loader() {
 }
 
 export async function action({ request }: Route.ActionArgs) {
+  if (!checkRateLimit(request)) {
+    return { error: "Too many requests. Please try again later." };
+  }
+
   const formData = await request.formData();
   const url = (formData.get("url") as string) ?? "";
 
