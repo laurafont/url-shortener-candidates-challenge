@@ -1,4 +1,6 @@
 import { PrismaClient } from "generated/prisma";
+import { PrismaPg } from "@prisma/adapter-pg";
+import { Pool } from "pg";
 import type { ShortLinkRepository } from "@url-shortener/engine";
 import { createShortLinkRepository } from "~/infrastructure/prisma/short-link-repository";
 
@@ -7,8 +9,13 @@ let shortLinkRepository: ShortLinkRepository | null = null;
 
 function getPrisma(): PrismaClient {
   if (!prisma) {
-    // Prisma reads DATABASE_URL from env when no adapter/accelerateUrl is passed
-    prisma = new PrismaClient({} as ConstructorParameters<typeof PrismaClient>[0]);
+    const connectionString = process.env.DATABASE_URL;
+    if (!connectionString) {
+      throw new Error("DATABASE_URL is not set");
+    }
+    const pool = new Pool({ connectionString });
+    const adapter = new PrismaPg(pool);
+    prisma = new PrismaClient({ adapter });
   }
   return prisma;
 }
