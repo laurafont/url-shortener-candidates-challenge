@@ -7,9 +7,10 @@
 
 html,
 body {
-  @apply bg-white dark:bg-gray-950;
+  @apply bg-white text-gray-900 antialiased;
 
   @media (prefers-color-scheme: dark) {
+    @apply bg-gray-950 text-gray-50;
     color-scheme: dark;
   }
 }

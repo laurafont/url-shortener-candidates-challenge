@@ -1,6 +1,15 @@
 import { Form, useActionData } from "react-router";
 import type { Route } from "./+types/_index";
 import { baseUrl } from "@url-shortener/engine";
+import { Button } from "~/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "~/components/ui/card";
+import { Input } from "~/components/ui/input";
 import { getShortLinkRepository } from "~/dependencies";
 import { checkRateLimit } from "~/lib/rate-limit";
 import { createShortLink } from "~/services/create-short-link";
@@ -44,56 +53,67 @@ export default function Index({ loaderData }: Route.ComponentProps) {
   const actionData = useActionData<typeof action>();
 
   return (
-    <main className="min-h-screen flex items-center justify-center bg-gradient-to-br from-lime-400 via-pink-500 to-cyan-300">
-      <div className="bg-yellow-300 p-12 rounded-none border-8 border-dashed border-purple-600 w-full max-w-lg rotate-1 shadow-2xl shadow-red-500">
-        <h1 className="text-4xl font-mono italic text-center mb-8 text-fuchsia-600 underline decoration-wavy decoration-green-500 tracking-widest">
-          ~*~ URL Shortener ~*~
-        </h1>
-
-        <Form method="post" className="flex flex-col gap-6">
-          <input
-            type="text"
-            name="url"
-            placeholder="Enter your URL here..."
-            required
-            className="w-full px-4 py-3 text-base bg-orange-200 border-4 border-blue-600 text-purple-800 placeholder-red-400 rounded focus:outline-none"
-          />
-
-          <div>
-            <button
-              type="submit"
-              className="w-full px-4 py-3 text-base bg-red-500 hover:bg-lime-500 text-yellow-200 border-4 border-teal-400 rounded-full skew-x-3 cursor-pointer"
-            >
-              ★ SHORTEN IT ★
-            </button>
-            <p className="text-sm text-indigo-800 mt-3 text-center font-bold bg-cyan-200 p-2 border-2 border-dotted border-orange-500">
-              Your shortened URL will start with {baseUrl}
-            </p>
-          </div>
-        </Form>
+    <main className="min-h-screen flex items-center justify-center bg-gray-50 px-4 py-12 dark:bg-gray-950">
+      <div className="w-full max-w-lg space-y-8">
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-2xl">URL Shortener</CardTitle>
+            <CardDescription>
+              Paste a long URL and get a short link. Shortened URLs start with{" "}
+              {baseUrl}
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Form method="post" className="flex flex-col gap-4">
+              <div className="grid gap-2">
+                <label htmlFor="url" className="text-sm font-medium">
+                  URL
+                </label>
+                <Input
+                  id="url"
+                  name="url"
+                  type="url"
+                  placeholder="https://example.com/your-long-url"
+                  required
+                />
+              </div>
+              <Button type="submit" className="w-full" size="lg">
+                Shorten URL
+              </Button>
+            </Form>
+          </CardContent>
+        </Card>
 
         {actionData?.shortenedUrl && (
-          <div className="mt-8 p-4 bg-violet-400 rounded-3xl border-4 border-double border-yellow-500 -rotate-1">
-            <p className="text-lg text-lime-300 mb-2 font-black uppercase">
-              Your shortened URL:
-            </p>
-            <a
-              href={actionData.shortenedUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-red-200 break-all font-mono text-xl hover:text-blue-900 bg-pink-600 p-2 block"
-            >
-              {actionData.shortenedUrl}
-            </a>
-          </div>
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg">Your shortened URL</CardTitle>
+              <CardDescription>Copy or open the link below</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <a
+                href={actionData.shortenedUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block break-all rounded-md border border-gray-200 bg-gray-50 px-3 py-2 font-mono text-sm text-gray-900 hover:bg-gray-100 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-50 dark:hover:bg-gray-800"
+              >
+                {actionData.shortenedUrl}
+              </a>
+            </CardContent>
+          </Card>
         )}
 
         {actionData?.error && (
-          <div className="mt-8 p-4 bg-lime-500 rounded-none border-8 border-solid border-red-700">
-            <p className="text-2xl text-blue-800 font-black">
-              {actionData.error}
-            </p>
-          </div>
+          <Card className="border-red-200 dark:border-red-900">
+            <CardContent className="pt-6">
+              <p
+                className="text-sm font-medium text-red-600 dark:text-red-400"
+                role="alert"
+              >
+                {actionData.error}
+              </p>
+            </CardContent>
+          </Card>
         )}
       </div>
     </main>
