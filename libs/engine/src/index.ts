@@ -1,3 +1,4 @@
 export { baseUrl } from "./base-url";
 
-export { shortenedUrls, generateShortCode } from "./shortened-url";
+export { shortenedUrls } from "./shortened-url";
+export { generateShortCode } from "./services/code-generator";
