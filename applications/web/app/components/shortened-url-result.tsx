@@ -35,6 +35,7 @@ export function ShortenedUrlResult({
           />
           <Button
             type="button"
+            className="hover:bg-gray-700 dark:hover:bg-gray-100"
             onClick={() => navigator.clipboard.writeText(shortenedUrl)}
           >
             Copy
@@ -44,11 +45,15 @@ export function ShortenedUrlResult({
           <Button
             type="button"
             variant="outline"
+            className="hover:bg-gray-900 hover:text-white dark:hover:bg-gray-800 dark:hover:text-white"
             onClick={() => onOpenChange(false)}
           >
             Done
           </Button>
-          <Button asChild>
+          <Button
+            asChild
+            className="hover:bg-gray-700 dark:hover:bg-gray-100"
+          >
             <a
               href={shortenedUrl}
               target="_blank"
