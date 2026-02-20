@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Form, useActionData } from "react-router";
+import { useEffect, useState } from "react";
+import { Form, useActionData, useNavigation } from "react-router";
 import type { Route } from "./+types/_index";
 import { baseUrl } from "@url-shortener/engine";
 import { Button } from "~/components/ui/button";
@@ -10,6 +10,14 @@ import {
   CardHeader,
   CardTitle,
 } from "~/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "~/components/ui/dialog";
 import { Input } from "~/components/ui/input";
 import { getShortLinkRepository } from "~/dependencies";
 import { validateUrl } from "~/lib/url-validation";
@@ -53,13 +61,20 @@ export function meta({}: Route.MetaArgs) {
 export default function Index({ loaderData }: Route.ComponentProps) {
   const { baseUrl } = loaderData;
   const actionData = useActionData<typeof action>();
+  const navigation = useNavigation();
   const [urlError, setUrlError] = useState<string | null>(null);
+
+  const isSubmitting = navigation.state === "submitting";
+  const [showSuccessDialog, setShowSuccessDialog] = useState(false);
+
+  useEffect(() => {
+    if (actionData?.shortenedUrl) setShowSuccessDialog(true);
+  }, [actionData?.shortenedUrl]);
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     const form = e.currentTarget;
     const urlInput = form.elements.namedItem("url");
-    const url =
-      urlInput && "value" in urlInput ? String(urlInput.value) : "";
+    const url = urlInput && "value" in urlInput ? String(urlInput.value) : "";
     const result = validateUrl(url);
     if (!result.ok) {
       e.preventDefault();
@@ -96,7 +111,9 @@ export default function Index({ loaderData }: Route.ComponentProps) {
                   type="url"
                   placeholder="https://example.com/your-long-url"
                   required
+                  disabled={isSubmitting}
                   aria-invalid={!!urlError}
+                  aria-busy={isSubmitting}
                   aria-describedby={urlError ? "url-error" : undefined}
                   onChange={() => setUrlError(null)}
                   className={
@@ -115,30 +132,63 @@ export default function Index({ loaderData }: Route.ComponentProps) {
                   </p>
                 )}
               </div>
-              <Button type="submit" className="w-full" size="lg">
-                Shorten URL
+              <Button
+                type="submit"
+                className="w-full"
+                size="lg"
+                disabled={isSubmitting}
+                aria-busy={isSubmitting}
+              >
+                {isSubmitting ? "Shortening…" : "Shorten URL"}
               </Button>
             </Form>
           </CardContent>
         </Card>
 
         {actionData?.shortenedUrl && (
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Your shortened URL</CardTitle>
-              <CardDescription>Copy or open the link below</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <a
-                href={actionData.shortenedUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="block break-all rounded-md border border-gray-200 bg-gray-50 px-3 py-2 font-mono text-sm text-gray-900 hover:bg-gray-100 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-50 dark:hover:bg-gray-800"
-              >
-                {actionData.shortenedUrl}
-              </a>
-            </CardContent>
-          </Card>
+          <Dialog open={showSuccessDialog} onOpenChange={setShowSuccessDialog}>
+            <DialogContent className="sm:max-w-md">
+              <DialogHeader>
+                <DialogTitle>Your shortened URL</DialogTitle>
+                <DialogDescription>
+                  Copy or open the link below
+                </DialogDescription>
+              </DialogHeader>
+              <div className="flex gap-2">
+                <Input
+                  readOnly
+                  value={actionData.shortenedUrl}
+                  className="font-mono text-sm"
+                />
+                <Button
+                  type="button"
+                  onClick={() =>
+                    navigator.clipboard.writeText(actionData.shortenedUrl)
+                  }
+                >
+                  Copy
+                </Button>
+              </div>
+              <DialogFooter>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setShowSuccessDialog(false)}
+                >
+                  Done
+                </Button>
+                <Button asChild>
+                  <a
+                    href={actionData.shortenedUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Open link
+                  </a>
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
         )}
 
         {actionData?.error && (
