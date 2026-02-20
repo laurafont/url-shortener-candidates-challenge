@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Form, useActionData } from "react-router";
 import type { Route } from "./+types/_index";
 import { baseUrl } from "@url-shortener/engine";
@@ -11,6 +12,7 @@ import {
 } from "~/components/ui/card";
 import { Input } from "~/components/ui/input";
 import { getShortLinkRepository } from "~/dependencies";
+import { validateUrl } from "~/lib/url-validation";
 import { checkRateLimit } from "~/lib/rate-limit";
 import { createShortLink } from "~/services/create-short-link";
 
@@ -51,6 +53,21 @@ export function meta({}: Route.MetaArgs) {
 export default function Index({ loaderData }: Route.ComponentProps) {
   const { baseUrl } = loaderData;
   const actionData = useActionData<typeof action>();
+  const [urlError, setUrlError] = useState<string | null>(null);
+
+  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    const form = e.currentTarget;
+    const urlInput = form.elements.namedItem("url");
+    const url =
+      urlInput && "value" in urlInput ? String(urlInput.value) : "";
+    const result = validateUrl(url);
+    if (!result.ok) {
+      e.preventDefault();
+      setUrlError(result.error);
+      return;
+    }
+    setUrlError(null);
+  }
 
   return (
     <main className="min-h-screen flex items-center justify-center bg-gray-50 px-4 py-12 dark:bg-gray-950">
@@ -64,7 +81,11 @@ export default function Index({ loaderData }: Route.ComponentProps) {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <Form method="post" className="flex flex-col gap-4">
+            <Form
+              method="post"
+              className="flex flex-col gap-4"
+              onSubmit={handleSubmit}
+            >
               <div className="grid gap-2">
                 <label htmlFor="url" className="text-sm font-medium">
                   URL
@@ -75,7 +96,24 @@ export default function Index({ loaderData }: Route.ComponentProps) {
                   type="url"
                   placeholder="https://example.com/your-long-url"
                   required
+                  aria-invalid={!!urlError}
+                  aria-describedby={urlError ? "url-error" : undefined}
+                  onChange={() => setUrlError(null)}
+                  className={
+                    urlError
+                      ? "border-red-500 focus-visible:ring-red-500 dark:border-red-700"
+                      : undefined
+                  }
                 />
+                {urlError && (
+                  <p
+                    id="url-error"
+                    className="text-sm font-medium text-red-600 dark:text-red-400"
+                    role="alert"
+                  >
+                    {urlError}
+                  </p>
+                )}
               </div>
               <Button type="submit" className="w-full" size="lg">
                 Shorten URL
