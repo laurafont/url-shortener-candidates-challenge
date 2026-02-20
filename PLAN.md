@@ -102,11 +102,15 @@ Based on [CHALLENGE_DESCRIPTION.md](./CHALLENGE_DESCRIPTION.md). Prioritized for
 
 **Tasks:**
 
-- [ ] **6.1** **UI (shadcn):** Add shadcn/ui (or Radix) and build a clean, modern layout. Replace the current “intentionally ugly” form and messages with shadcn components (Button, Input, Card, etc.).
+- [ ] **6.1** **UI (shadcn):** Add shadcn/ui and build a clean, modern layout. Replace the current “intentionally ugly” form and messages with shadcn components (Button, Input, Card, etc.).
 - [ ] **6.2** **Input validation:** Client-side validation on the URL form (required, valid URL format). Show inline errors; keep server-side validation as source of truth and show action errors.
-- [ ] **6.3** **Loading and error handling:** Use React Router’s `useNavigation()` (or equivalent) to show loading state on submit. Display server errors (e.g. “Invalid URL”, “Something went wrong”) in the UI.
-- [ ] **6.4** **Toast on success:** After a successful create, show a toast (e.g. sonner or shadcn toast) with the shortened URL and optionally a “Copy” action.
-- [ ] **6.5** **List view with statistics:** Add a view that lists shortened URLs with click counts (and optionally last clicked). Use the loader from step 4.3. Empty state when there are no links (clear message + CTA to create one).
+- [ ] **6.3** **Loading and error handling:** Use React Router’s `useNavigation()` to show loading state on submit. Display server errors (e.g. “Invalid URL”, “Something went wrong”) in the UI.
+- [ ] **6.4** **Toast on success:** After a successful create, show a toast (shadcn toast) with the shortened URL and a “Copy” action.
+- [ ] **6.5** **List view with statistics:** Add a view that lists shortened URLs with click counts. Use the loader from step 4.3. Empty state when there are no links (clear message + CTA to create one).
+- [ ] **6.6** Split into components (ShortenForm, ShortenedUrlResult, LinkList, EmptyState) and keep routes thin.
+- [ ] **6.7** Use useNavigation() for loading state and aria-busy/disabled for accessibility.
+- [ ] **6.8** Add Toaster in root.tsx and use toasts for success/error.
+- [ ] **6.7** Use useNavigation() for loading state and aria-busy/disabled for accessibility.
 
 **Files:** `applications/web/app/root.tsx` (providers, Toaster), `applications/web/app/routes/_index.tsx`, new components under `app/components/` (e.g. `ShortenForm`, `LinkList`, `EmptyState`), shadcn config and components.
 
