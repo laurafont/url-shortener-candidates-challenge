@@ -1,0 +1,30 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model ShortLink {
+  id          String   @id @default(cuid())
+  code        String   @unique
+  originalUrl String
+  createdAt   DateTime @default(now())
+  clicks      Click[]
+}
+
+model Click {
+  id         String   @id @default(cuid())
+  shortLinkId String
+  shortLink  ShortLink @relation(fields: [shortLinkId], references: [id], onDelete: Cascade)
+  createdAt  DateTime @default(now())
+  userAgent  String?  // optional, for abuse analysis
+  ip         String?  // optional, for abuse analysis
+
+  @@index([shortLinkId])
+}

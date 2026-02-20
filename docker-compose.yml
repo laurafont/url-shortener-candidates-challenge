@@ -1,10 +1,27 @@
 services:
+  postgres:
+    image: postgres:16-alpine
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: urlshortener
+      POSTGRES_PASSWORD: urlshortener
+      POSTGRES_DB: urlshortener
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
   web:
     build:
       context: .
       dockerfile: Dockerfile
     ports:
       - "3000:3000"
+    depends_on:
+      - postgres
     environment:
       - NODE_ENV=production
       - PUBLIC_URL=http://localhost:3000
+      - DATABASE_URL=postgresql://urlshortener:urlshortener@postgres:5432/urlshortener
+
+volumes:
+  postgres_data:
